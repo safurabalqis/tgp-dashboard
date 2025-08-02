@@ -25,10 +25,23 @@ def impact():
     hour_labels = [row[0] for row in hour_data]
     hour_counts = [row[1] for row in hour_data]
 
+   # -- Pie Chart: Most Severe Injury
+    injury_data = (
+        db.session.query(Crash.most_severe_injury, db.func.count(Crash.crash_record_id))
+        .group_by(Crash.most_severe_injury)
+        .order_by(db.func.count(Crash.crash_record_id).desc())
+        .all()
+    )
+
+    injury_labels = [row[0] if row[0] else 'Unknown' for row in injury_data]
+    injury_values = [row[1] for row in injury_data]
+
     return render_template(
         'impact.html',
         labels=labels,
         values=values,
         hour_labels=hour_labels,
-        hour_counts=hour_counts
+        hour_counts=hour_counts,
+        injury_labels=injury_labels,
+        injury_values=injury_values
     )

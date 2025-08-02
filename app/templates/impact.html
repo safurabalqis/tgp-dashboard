@@ -18,6 +18,13 @@
     <div class="chart-container" style="width: 100%; max-width: 700px;">
         <canvas id="hourChart"></canvas>
     </div>
+
+    <h3>🩹 Most Severe Injury in Crashes</h3>
+    <p>This pie chart shows the distribution of the most severe injury sustained in each crash.</p>
+
+    <div class="chart-container" style="width: 100%; max-width: 600px;">
+        <canvas id="injuryChart"></canvas>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,6 +33,8 @@
     const values = {{ values | tojson }};
     const hour_labels = {{ hour_labels | tojson }};
     const hour_counts = {{ hour_counts | tojson }};
+    const injury_labels = {{ injury_labels | tojson }};
+    const injury_values = {{ injury_values | tojson }};
 </script>
 <script src="{{ url_for('static', filename='js/impact_charts.js') }}"></script>
 {% endblock %}

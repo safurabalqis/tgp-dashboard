@@ -69,3 +69,32 @@ const hourChart = new Chart(ctx2, {
         }
     }
 });
+
+// Pie Chart: Most Severe Injury
+const ctxInjury = document.getElementById('injuryChart');
+new Chart(ctxInjury, {
+    type: 'pie',
+    data: {
+        labels: injury_labels,
+        datasets: [{
+            label: 'Most Severe Injury',
+            data: injury_values,
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#8E44AD', '#2ECC71', '#95A5A6'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            },
+            title: {
+                display: true,
+                text: 'Most Severe Injury per Crash'
+            }
+        }
+    }
+});
