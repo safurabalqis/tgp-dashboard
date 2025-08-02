@@ -3,37 +3,94 @@
 
 {% block content %}
 <div class="page-content">
-    <h2>🏆 Crash Impact Analysis</h2>
-    <p>This chart shows how many crashes fall into each severity type.</p>
+    <h2 class="mb-4">🏆 Crash Impact Analysis</h2>
 
-    <!-- FLEX CONTAINER: Bar and Pie side-by-side -->
-    <div class="flex-charts">
-        <!-- Bar Chart: Crash Type -->
-        <div class="chart-container" style="width: 100%; max-width: 700px;">
-            <canvas id="impactChart"></canvas>
+    <!-- Filter Dropdown -->
+    <form method="get" class="mb-4">
+        <label for="crashTypeFilter" class="form-label">🔍 Filter by Crash Type:</label>
+        <select name="crash_type" id="crashTypeFilter" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
+            <option value="All" {% if selected_crash_type == 'All' %}selected{% endif %}>All</option>
+            {% for ct in crash_type_options %}
+                <option value="{{ ct }}" {% if selected_crash_type == ct %}selected{% endif %}>{{ ct }}</option>
+            {% endfor %}
+        </select>
+        <span class="ms-3 text-muted">Current Filter: <strong>{{ selected_crash_type }}</strong></span>
+    </form>
+
+    <!-- Injury Breakdown Cards -->
+    <div class="injury-breakdown row g-4 mb-5">
+        {% for injury, count in injury_breakdown.items() %}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 hover-shadow">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-muted mb-2">{{ injury }}</h6>
+                    <p class="display-6 fw-bold text-primary">{{ count }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bar + Pie Side by Side -->
+    <div class="row g-4 mb-5 align-items-center">
+        <div class="col-lg-6">
+            <h5 class="mb-2">📊 Crash Severity Type</h5>
+            <p>This chart shows how many crashes fall into each severity type.</p>
+            <div class="chart-container">
+                <canvas id="impactChart"></canvas>
+            </div>
         </div>
 
-        <!-- Pie Chart: Injury Severity -->
-        <div class="chart-container" style="width: 100%; max-width: 600px;">
-            <canvas id="injuryChart"></canvas>
+        <div class="col-lg-6">
+            <h5 class="mb-2">🩹 Most Severe Injury</h5>
+            <p>This pie chart shows the distribution of the most severe injury in each crash.</p>
+            <div class="chart-container">
+                <canvas id="injuryChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <hr style="margin: 40px 0;">
+    <hr class="my-5">
 
+    <!-- Crash Frequency Line Chart -->
     <h3>⏰ Crash Frequency by Hour of Day</h3>
-    <p>Understand when most crashes occur during the day (0–23 hours).</p>
+  <p>Understand when most crashes occur during the day (0–23 hours).</p>
 
-    <!-- Full Width Line Chart -->
-    <div class="chart-container" style="width: 100%; max-width: 1000px; margin: auto;">
+  {% if hour_insights %}
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Most Frequent Hour</h6>
+                    <p class="display-6 text-primary fw-bold">{{ hour_insights.most_frequent_hour }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Avg Crashes/Hour</h6>
+                    <p class="display-6 text-success fw-bold">{{ hour_insights.avg_crash_hour }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Top 3 Hours</h6>
+                    <p class="fw-bold">{{ hour_insights.top_hours | join(', ') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+  {% endif %}
+    <div class="chart-container" style="max-width: 1000px; margin: auto;">
         <canvas id="hourChart"></canvas>
     </div>
 </div>
 
-<!-- Chart.js library -->
+<!-- Chart.js Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Pass data from Flask -->
 <script>
     const labels = {{ labels | tojson }};
     const values = {{ values | tojson }};
@@ -42,9 +99,5 @@
     const injury_labels = {{ injury_labels | tojson }};
     const injury_values = {{ injury_values | tojson }};
 </script>
-
-<!-- Chart logic -->
 <script src="{{ url_for('static', filename='js/impact_charts.js') }}"></script>
-
-
 {% endblock %}
