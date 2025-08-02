@@ -38,10 +38,10 @@ def landing():
     """Landing page"""
     return render_template('landing.html')
 
-@app.route('/athletes')
+@app.route('/offenseType')
 def athletes():
     """Athletes analysis page"""
-    return render_template('athletes.html', data=SAMPLE_DATA)
+    return render_template('offenseType.html', data=SAMPLE_DATA)
 
 @app.route('/medals')
 def medals():
