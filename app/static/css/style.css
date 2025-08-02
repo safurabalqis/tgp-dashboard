@@ -449,3 +449,74 @@ body {
 .sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
+
+/* Style for Offense Type Page */
+
+  .container {
+      max-width: 1200px;
+      margin: 1rem auto;
+      padding: 0 1rem;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .filters label {
+      font-weight: bold;
+    }
+    .filters input,
+    .filters select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .filters button {
+      padding: 0.6rem 1rem;
+      background: var(--primary-color);
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .filters button:hover {
+      background: #217dbb;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .small-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .small-table th,
+    .small-table td {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    #hitrun-map {
+      height: 300px;
+      border-radius: 4px;
+    }

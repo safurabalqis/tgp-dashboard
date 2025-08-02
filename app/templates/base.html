@@ -1,58 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Traffic Crash 2024 Dashboard{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h3>Traffic Crash 2024</h3>
-            </div>
-            <ul class="sidebar-nav">
-                <li><a href="{{ url_for('landing') }}" class="nav-link">Location (overview) Page</a></li>
-                <li><a href="{{ url_for('athletes') }}" class="nav-link">Offense type Analysis</a></li>
-                <li><a href="{{ url_for('impact') }}" class="nav-link">Crash impact Analysis</a></li>
-                <li><a href="{{ url_for('sports') }}" class="nav-link">Environmental risks Analysis</a></li>
-            </ul>
-        </nav>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            {% block title %}Traffic Crash 2024 Dashboard{% endblock %}
+        </title>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <header class="dashboard-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1>{% block header %}Welcome to Traffic Crash 2024 Dashboard{% endblock %}</h1>
-                        <p class="text-muted">Hello</p>
-                    </div>
-                    <div class="user-info">
-                        <span class="text-muted"><TGP-Paynet></TGP-Paynet></span>
-                        <span class="text-muted">tgp@gmail.com</span>
-                        <div class="user-avatar">👤</div>
-                    </div>
+        <!-- Bootstrap CSS -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet" />
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Custom CSS -->
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/style.css') }}" />
+    </head>
+    <body>
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <nav class="sidebar">
+                <div class="sidebar-header">
+                    <h3>Traffic Crash 2024</h3>
                 </div>
-            </header>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="{{ url_for('landing') }}" class="nav-link"
+                            >Location (overview) Page</a
+                        >
+                    </li>
+                    <li>
+                        <a href="{{ url_for('offenseType') }}" class="nav-link"
+                            >Offense type Analysis</a
+                        >
+                    </li>
+                    <li>
+                        <a href="{{ url_for('impact') }}" class="nav-link"
+                            >Crash impact Analysis</a
+                        >
+                    </li>
+                    <li>
+                        <a href="{{ url_for('sports') }}" class="nav-link"
+                            >Environmental risks Analysis</a
+                        >
+                    </li>
+                </ul>
+            </nav>
 
-            <main class="dashboard-main">
-                {% block content %}{% endblock %}
-            </main>
+            <!-- Main Content -->
+            <div class="main-content">
+                <header class="dashboard-header">
+                    <div
+                        class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1>
+                                {% block header %}Welcome to Traffic Crash 2024
+                                Dashboard{% endblock %}
+                            </h1>
+                            <p class="text-muted">Hello</p>
+                        </div>
+                        <div class="user-info">
+                            <span class="text-muted"
+                                ><TGP-Paynet></TGP-Paynet
+                            ></span>
+                            <span class="text-muted">tgp@gmail.com</span>
+                            <div class="user-avatar">👤</div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="dashboard-main">
+                    {% block content %}{% endblock %}
+                </main>
+            </div>
         </div>
-    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    {% block scripts %}{% endblock %}
-</body>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Custom JS -->
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        {% block scripts %}{% endblock %}
+    </body>
 </html>
