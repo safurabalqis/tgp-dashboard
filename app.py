@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from config import Config
 from app.models.models import db, Crash
 from app.routes.offense import offense_bp
+from app.routes.impact import impact_bp
 import json
 
 # Create Flask app with correct template and static folders
@@ -14,6 +15,8 @@ app.config.from_object(Config)
 db.init_app(app)
 
 app.register_blueprint(offense_bp)
+app.register_blueprint(impact_bp)
+
 
 # Sample Olympics data
 SAMPLE_DATA = {
@@ -45,36 +48,6 @@ def dashboard():
 def landing():
     """Landing page"""
     return render_template('landing.html')
-
-@app.route('/impact')
-def impact():
-    # -- Bar chart: Crash type
-    crash_data = (
-        db.session.query(Crash.crash_type, db.func.count(Crash.crash_record_id))
-        .group_by(Crash.crash_type)
-        .order_by(db.func.count(Crash.crash_record_id).desc())
-        .all()
-    )
-    labels = [row[0] if row[0] else 'Unknown' for row in crash_data]
-    values = [row[1] for row in crash_data]
-
-    # -- Line chart: Crashes per hour
-    hour_data = (
-        db.session.query(Crash.crash_hour, db.func.count(Crash.crash_record_id))
-        .group_by(Crash.crash_hour)
-        .order_by(Crash.crash_hour)
-        .all()
-    )
-    hour_labels = [row[0] for row in hour_data]
-    hour_counts = [row[1] for row in hour_data]
-
-    return render_template(
-        'impact.html',
-        labels=labels,
-        values=values,
-        hour_labels=hour_labels,
-        hour_counts=hour_counts
-    )
 
 
 @app.route('/sports')
