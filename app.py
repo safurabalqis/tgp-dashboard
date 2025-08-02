@@ -81,19 +81,33 @@ def offenseType():
 
 @app.route('/impact')
 def impact():
-    # Query the crash_type and count how many times each type appears
+    # -- Bar chart: Crash type
     crash_data = (
         db.session.query(Crash.crash_type, db.func.count(Crash.crash_record_id))
         .group_by(Crash.crash_type)
         .order_by(db.func.count(Crash.crash_record_id).desc())
         .all()
     )
-
-    # Prepare data for Chart.js
     labels = [row[0] if row[0] else 'Unknown' for row in crash_data]
     values = [row[1] for row in crash_data]
 
-    return render_template('impact.html', labels=labels, values=values)
+    # -- Line chart: Crashes per hour
+    hour_data = (
+        db.session.query(Crash.crash_hour, db.func.count(Crash.crash_record_id))
+        .group_by(Crash.crash_hour)
+        .order_by(Crash.crash_hour)
+        .all()
+    )
+    hour_labels = [row[0] for row in hour_data]
+    hour_counts = [row[1] for row in hour_data]
+
+    return render_template(
+        'impact.html',
+        labels=labels,
+        values=values,
+        hour_labels=hour_labels,
+        hour_counts=hour_counts
+    )
 
 
 @app.route('/sports')

@@ -9,12 +9,22 @@
     <div class="chart-container" style="width: 100%; max-width: 700px;">
         <canvas id="impactChart"></canvas>
     </div>
+
+    <hr style="margin: 40px 0;">
+
+    <h3>⏰ Crash Frequency by Hour of Day</h3>
+    <p>Understand when most crashes occur during the day (0–23 hours).</p>
+
+    <div class="chart-container" style="width: 100%; max-width: 700px;">
+        <canvas id="hourChart"></canvas>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('impactChart').getContext('2d');
-    const impactChart = new Chart(ctx, {
+    // Bar chart for crash types
+    const ctx1 = document.getElementById('impactChart').getContext('2d');
+    const impactChart = new Chart(ctx1, {
         type: 'bar',
         data: {
             labels: {{ labels | tojson }},
@@ -40,6 +50,44 @@
                     title: {
                         display: true,
                         text: 'Crash Severity Type'
+                    }
+                }
+            }
+        }
+    });
+
+    // Line chart for crash frequency by hour
+    const ctx2 = document.getElementById('hourChart').getContext('2d');
+    const hourChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: {{ hour_labels | tojson }},
+            datasets: [{
+                label: 'Number of Crashes by Hour',
+                data: {{ hour_counts | tojson }},
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hour of Day (0–23)'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Crashes'
                     }
                 }
             }
