@@ -1,11 +1,16 @@
 from flask import Flask, render_template, request, jsonify
+from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
+from app.models.models import db, Crash
 import json
 
 # Create Flask app with correct template and static folders
 app = Flask(__name__, 
            template_folder='app/templates',
            static_folder='app/static')
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
+
+db.init_app(app)
 
 # Sample Olympics data
 SAMPLE_DATA = {
@@ -43,10 +48,22 @@ def athletes():
     """Athletes analysis page"""
     return render_template('offenseType.html', data=SAMPLE_DATA)
 
-@app.route('/medals')
-def medals():
-    """Medals analysis page"""
-    return render_template('medals.html', data=SAMPLE_DATA)
+@app.route('/impact')
+def impact():
+    # Query the crash_type and count how many times each type appears
+    crash_data = (
+        db.session.query(Crash.crash_type, db.func.count(Crash.crash_record_id))
+        .group_by(Crash.crash_type)
+        .order_by(db.func.count(Crash.crash_record_id).desc())
+        .all()
+    )
+
+    # Prepare data for Chart.js
+    labels = [row[0] if row[0] else 'Unknown' for row in crash_data]
+    values = [row[1] for row in crash_data]
+
+    return render_template('impact.html', labels=labels, values=values)
+
 
 @app.route('/sports')
 def sports():
