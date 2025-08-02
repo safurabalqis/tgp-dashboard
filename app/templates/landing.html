@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block header %}Landing Page{% endblock %}
+{% block content %}
+<div class="page-content">
+    <h2>🏠 Welcome to Olympics 2024</h2>
+    <p>This is the landing page for the Olympics Dashboard.</p>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+</div>
+{% endblock %}
