@@ -6,8 +6,17 @@
     <h2>🏆 Crash Impact Analysis</h2>
     <p>This chart shows how many crashes fall into each severity type.</p>
 
-    <div class="chart-container" style="width: 100%; max-width: 700px;">
-        <canvas id="impactChart"></canvas>
+    <!-- FLEX CONTAINER: Bar and Pie side-by-side -->
+    <div class="flex-charts">
+        <!-- Bar Chart: Crash Type -->
+        <div class="chart-container" style="width: 100%; max-width: 700px;">
+            <canvas id="impactChart"></canvas>
+        </div>
+
+        <!-- Pie Chart: Injury Severity -->
+        <div class="chart-container" style="width: 100%; max-width: 600px;">
+            <canvas id="injuryChart"></canvas>
+        </div>
     </div>
 
     <hr style="margin: 40px 0;">
@@ -15,19 +24,16 @@
     <h3>⏰ Crash Frequency by Hour of Day</h3>
     <p>Understand when most crashes occur during the day (0–23 hours).</p>
 
-    <div class="chart-container" style="width: 100%; max-width: 700px;">
+    <!-- Full Width Line Chart -->
+    <div class="chart-container" style="width: 100%; max-width: 1000px; margin: auto;">
         <canvas id="hourChart"></canvas>
-    </div>
-
-    <h3>🩹 Most Severe Injury in Crashes</h3>
-    <p>This pie chart shows the distribution of the most severe injury sustained in each crash.</p>
-
-    <div class="chart-container" style="width: 100%; max-width: 600px;">
-        <canvas id="injuryChart"></canvas>
     </div>
 </div>
 
+<!-- Chart.js library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Pass data from Flask -->
 <script>
     const labels = {{ labels | tojson }};
     const values = {{ values | tojson }};
@@ -36,5 +42,9 @@
     const injury_labels = {{ injury_labels | tojson }};
     const injury_values = {{ injury_values | tojson }};
 </script>
+
+<!-- Chart logic -->
 <script src="{{ url_for('static', filename='js/impact_charts.js') }}"></script>
+
+
 {% endblock %}
