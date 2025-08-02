@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from config import Config
 from app.models.models import db, Crash
+from app.routes.offense import offense_bp
 import json
 
 # Create Flask app with correct template and static folders
@@ -11,6 +12,8 @@ app = Flask(__name__,
 app.config.from_object(Config)
 
 db.init_app(app)
+
+app.register_blueprint(offense_bp)
 
 # Sample Olympics data
 SAMPLE_DATA = {
@@ -42,42 +45,6 @@ def dashboard():
 def landing():
     """Landing page"""
     return render_template('landing.html')
-
-@app.route('/offenseType')
-def offenseType():
-        # Fetch distinct beats for the filter dropdown
-    beats_q = (
-        db.session.query(Crash.beat_of_occurrence)
-        .distinct()
-        .order_by(Crash.beat_of_occurrence)
-        .all()
-    )
-    # unpack list of single‐tuples into a flat list
-    beats = [b[0] for b in beats_q]
-
-    # Query top 10 primary contributory causes
-    crash_data = (
-        db.session.query(
-            Crash.prim_contributory_cause,
-            db.func.count(Crash.crash_record_id).label('cnt')
-        )
-        .group_by(Crash.prim_contributory_cause)
-        .order_by(db.func.count(Crash.crash_record_id).desc())
-        .limit(10)
-        .all()
-    )
-
-    # Prepare labels & values for Chart.js
-    labels = [(c if c else 'Unknown') for c, _ in crash_data]
-    values = [n for _, n in crash_data]
-
-    # Render the offense.html template
-    return render_template(
-        'offense.html',
-        beats=beats,
-        labels=labels,
-        values=values
-    )
 
 @app.route('/impact')
 def impact():

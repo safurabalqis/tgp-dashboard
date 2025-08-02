@@ -4,8 +4,8 @@
 
     <!-- Filters -->
     <div class="filters">
-        <label for="beat-select">Beat:</label>
-        <select id="beat-select">
+        <label for="region-select">Beat:</label>
+        <select id="region-select">
             <option value="all">All Beats</option>
             {% for b in beats %}
             <option value="{{ b }}">{{ b }}</option>
@@ -21,29 +21,7 @@
 </div>
 {% endblock %} {% block scripts %}
 <script>
-    // Pass Python data into JS
-    const causeLabels = {{ labels|tojson }};
-    const causeValues = {{ values|tojson }};
-
-    // Render Chart.js bar chart
-    new Chart(document.getElementById('cause-chart'), {
-      type: 'bar',
-      data: {
-        labels: causeLabels,
-        datasets: [{
-          label: 'Crash Count',
-          data: causeValues,
-          backgroundColor: 'rgba(52, 152, 219, 0.7)'
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        scales: {
-          x: { title: { display: true, text: 'Count' } },
-          y: { title: { display: true, text: 'Cause' } }
-        },
-        responsive: true
-      }
-    });
+    window.initialLabels = {{ labels|tojson }};
+    window.initialValues = {{ values|tojson }};
 </script>
 {% endblock %}

@@ -1,53 +1,59 @@
-// fire on Apply or on page load
-document
-    .getElementById("apply-filters")
-    .addEventListener("click", fetchAndDraw);
+// static/js/offense.js
+// console.log(123);
+// grab DOM nodes
+let beatSelect, ctx, causeChart;
 
-function fetchAndDraw() {
-    const params = new URLSearchParams({
-        start_date: document.getElementById("start-date").value,
-        end_date: document.getElementById("end-date").value,
-        region: document.getElementById("region-select").value,
+// initialize chart with the data passed from Flask
+function initChart() {
+    causeChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: window.initialLabels,
+            datasets: [
+                {
+                    label: "Crash Count",
+                    data: window.initialValues,
+                    backgroundColor: "rgba(52, 152, 219, 0.7)",
+                },
+            ],
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: "Count" } },
+                y: { title: { display: true, text: "Cause" } },
+            },
+        },
     });
+}
 
-    fetch(`/offense/api/cause-distribution?${params}`)
-        .then((res) => res.json())
+// fetch fresh data from your API and redraw chart
+function fetchAndDraw() {
+    const beat = encodeURIComponent(beatSelect.value);
+    fetch(`/offense/api/primary-cause?beat=${beat}`)
+        .then((r) => r.json())
         .then((data) => {
             const labels = data.map((d) => d.cause || "Unknown");
             const counts = data.map((d) => d.count);
 
-            // Destroy existing chart if needed
-            if (window.causeChart) window.causeChart.destroy();
-
-            // Render horizontal bar chart
-            const ctx = document.getElementById("cause-chart").getContext("2d");
-            window.causeChart = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels,
-                    datasets: [{ label: "Crash Count", data: counts }],
-                },
-                options: {
-                    indexAxis: "y",
-                    responsive: true,
-                    scales: {
-                        x: { title: { display: true, text: "Count" } },
-                    },
-                },
-            });
-
-            // Populate table
-            const tbody = document.querySelector("#cause-table tbody");
-            tbody.innerHTML = data
-                .map(
-                    (d) =>
-                        `<tr><td>${d.cause || "Unknown"}</td><td>${
-                            d.count
-                        }</td></tr>`,
-                )
-                .join("");
+            // update existing chart
+            causeChart.data.labels = labels;
+            causeChart.data.datasets[0].data = counts;
+            causeChart.update();
         });
 }
 
-// Initial draw with defaults (optional):
-document.addEventListener("DOMContentLoaded", fetchAndDraw);
+// wire up events
+document.addEventListener("DOMContentLoaded", () => {
+    beatSelect = document.getElementById("region-select");
+    ctx = document.getElementById("cause-chart").getContext("2d");
+
+    initChart();
+
+    beatSelect.addEventListener("change", (event) => {
+        console.log("Beat changed to:", event.target.value);
+        // or alert('Beat changed to: ' + event.target.value);
+        fetchAndDraw();
+    });
+});
