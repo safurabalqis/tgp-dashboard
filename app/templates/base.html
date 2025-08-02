@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Olympics 2024 Dashboard{% endblock %}</title>
+    <title>{% block title %}Traffic Crash 2024 Dashboard{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,10 +20,10 @@
                 <h3>🏅 Olympics</h3>
             </div>
             <ul class="sidebar-nav">
-                <li><a href="{{ url_for('landing') }}" class="nav-link">🏠 Landing Page</a></li>
-                <li><a href="{{ url_for('athletes') }}" class="nav-link">👥 Athletes Analysis</a></li>
-                <li><a href="{{ url_for('medals') }}" class="nav-link">🏆 Medals Analysis</a></li>
-                <li><a href="{{ url_for('sports') }}" class="nav-link">⚽ Sports Analysis</a></li>
+                <li><a href="{{ url_for('landing') }}" class="nav-link">Location (overview) Page</a></li>
+                <li><a href="{{ url_for('athletes') }}" class="nav-link">Offense type Analysis</a></li>
+                <li><a href="{{ url_for('medals') }}" class="nav-link">Crash impact Analysis</a></li>
+                <li><a href="{{ url_for('sports') }}" class="nav-link">Environmental risks Analysis</a></li>
             </ul>
         </nav>
 
@@ -32,12 +32,12 @@
             <header class="dashboard-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h1>{% block header %}Welcome to Olympics 2024 Dashboard{% endblock %}</h1>
-                        <p class="text-muted">This dashboard has been developed by Group 2</p>
+                        <h1>{% block header %}Welcome to Traffic Crash 2024 Dashboard{% endblock %}</h1>
+                        <p class="text-muted">Hello</p>
                     </div>
                     <div class="user-info">
-                        <span class="text-muted">Group 2</span>
-                        <span class="text-muted">group2@gmail.com</span>
+                        <span class="text-muted"><TGP-Paynet></TGP-Paynet></span>
+                        <span class="text-muted">tgp@gmail.com</span>
                         <div class="user-avatar">👤</div>
                     </div>
                 </div>
