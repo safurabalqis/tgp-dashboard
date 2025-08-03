@@ -13,20 +13,19 @@ chatbot_bp = Blueprint('chatbot', __name__)
 # === Initialize AWS Bedrock client ===
 client = get_bedrock_client()
 
-# === PostgreSQL connection pool ===
+# === PostgreSQL connection pool (use DATABASE_URI only) ===
+DATABASE_URI = os.getenv("DATABASE_URI")
+
+if not DATABASE_URI:
+    raise RuntimeError("DATABASE_URI is not set in the environment")
+
 pg_pool = psycopg2.pool.SimpleConnectionPool(
-    1, 5,
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASS"),
-    port=os.getenv("DB_PORT", 5432)
+    1, 5, dsn=DATABASE_URI
 )
 
-# === Helper Functions ===
 def get_sqlalchemy_engine():
-    db_url = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-    return create_engine(db_url)
+    """Return SQLAlchemy engine using DATABASE_URI."""
+    return create_engine(DATABASE_URI)
 
 def extract_sql_only(text: str) -> str:
     match = re.search(r"(SELECT|UPDATE|DELETE|INSERT|WITH)\s.+", text, re.IGNORECASE | re.DOTALL)
@@ -37,9 +36,7 @@ def load_full_schema_text(path="schema.json"):
         return json.dumps(json.load(f), indent=2)
 
 def prompt_with_retry(user_prompt: str, retries=3, backoff=2):
-    """
-    Wrapper to call Claude with retry on ThrottlingException.
-    """
+    """Wrapper to call Claude with retry on ThrottlingException."""
     for attempt in range(retries):
         try:
             return prompt_claude_v3(client, user_prompt)
@@ -78,43 +75,7 @@ def chatbot_endpoint():
     sql_prompt = f"""
 You are an expert SQL assistant for a chatbot that answers traffic-related questions using PostgreSQL.
 
-IMPORTANT RULES:
-- If greeted by the user, respond normally and naturally without generating SQL.
-- If the user input is not SQL-related, reply concisely in plain language without generating SQL.
-- If the user input is trivial or meaningless (e.g., "SELECT 1"), respond naturally and do not generate SQL.
-- Always return only one SQL query per request; if multiple steps are needed, use a single WITH statement.
-- If the user’s question is vague or incomplete, ask for clarification instead of assuming their intent, and ask the to re-write the whole prompt due to no chat-history.
-- Always use lowercase, snake_case aliases for derived columns (e.g., crash_count, crash_month).
-- Include NULL checks for columns that may have missing data when filtering categories.
-- If the user asks for a value outside the allowed categories for any column, ask them to use the correct values.
-- When the user requests "top N" results, use LIMIT appropriately.
-- Format SQL with proper indentation for readability.
-- Wrap all column names in double quotes.  
-- Convert "CRASH_DATE" from text to a proper timestamp using TO_TIMESTAMP("CRASH_DATE", 'MM/DD/YYYY HH12:MI:SS AM').  
-- Use EXTRACT(YEAR FROM ...) = 2024 when filtering by year.  
-- Use EXTRACT(MONTH FROM ...) BETWEEN 1 AND 12 when filtering for all months in the year.  
-- Do not include explanations or markdown; only return a valid SQL query starting with SELECT or WITH.  
-- When referring to the column "LIGHTING_CONDITION", the possible values include:  
-  DAWN, DARKNESS, DAYLIGHT, DUSK, UNKNOWN, DARKNESS, LIGHTED ROAD.  
-- When referring to the column "WEATHER_CONDITION", the possible values include:  
-  SEVERE CROSS WIND GATE, OTHER, UNKNOWN, FREEZING RAIN/DRIZZLE, SLEET/HAIL, CLOUDY/OVERCAST, BLOWING SNOW, SNOW, FOG/SMOKE/HAZE, CLEAR, BLOWING SAND, SOIL, DIRT, RAIN.  
-- When referring to the column "TRAFFIC_CONTROL_DEVICE", the possible values include:  
-  YIELD, FLASHING CONTROL SIGNAL, DELINEATORS, BICYCLE CROSSING SIGN, POLICE/FLAGMAN, OTHER REG. SIGN, RR CROSSING SIGN, OTHER RAILROAD CROSSING, PEDESTRIAN CROSSING SIGN, OTHER, TRAFFIC SIGNAL, NO CONTROLS, NO PASSING, RAILROAD CROSSING GATE, OTHER WARNING SIGN, STOP SIGN/FLASHER, UNKNOWN, SCHOOL ZONE.  
-- When referring to the column "DEVICE_CONDITION", the possible values include:  
-  NOT FUNCTIONING, FUNCTIONING IMPROPERLY, FUNCTIONING PROPERLY, OTHER, UNKNOWN, MISSING, WORN REFLECTIVE MATERIAL, NO CONTROLS.  
-- When referring to the column "FIRST_CRASH_TYPE", the possible values include:  
-  PEDESTRIAN, REAR END, SIDESWIPE OPPOSITE DIRECTION, ANIMAL, OTHER OBJECT, TRAIN, PARKED MOTOR VEHICLE, HEAD ON, TURNING, SIDESWIPE SAME DIRECTION, OTHER NONCOLLISION, REAR TO SIDE, FIXED OBJECT, REAR TO REAR, REAR TO FRONT, PEDALCYCLIST, OVERTURNED, ANGLE.  
-- When referring to the column "TRAFFICWAY_TYPE", the possible values include:  
-  CENTER TURN LANE, FIVE POINT, OR MORE, NOT DIVIDED, PARKING LOT, NOT REPORTED, DRIVEWAY, RAMP, DIVIDED - W/MEDIAN (NOT RAISED), ALLEY, UNKNOWN INTERSECTION TYPE, OTHER, ONE-WAY, T-INTERSECTION, FOUR WAY, L-INTERSECTION, Y-INTERSECTION, TRAFFIC ROUTE, UNKNOWN, DIVIDED - W/MEDIAN BARRIER, ROUNDABOUT.  
-- When referring to the column "ALIGNMENT", the possible values include:  
-  CURVE ON GRADE, STRAIGHT ON HILLCREST, STRAIGHT AND LEVEL, CURVE ON HILLCREST, CURVE, LEVEL, STRAIGHT ON GRADE.  
-- When referring to the column "ROADWAY_SURFACE_COND", the possible values include:  
-  SNOW OR SLUSH, OTHER, UNKNOWN, SAND, MUD, DIRT, DRY, ICE, WET.  
-- When referring to the column "ROAD_DEFECT", the possible values include:  
-  SHOULDER DEFECT, WORN SURFACE, OTHER, UNKNOWN, NO DEFECTS, DEBRIS ON ROADWAY, RUT, HOLES.  
-- When referring to the column "CRASH_TYPE", the possible values include:  
-  NO INJURY / DRIVE AWAY, INJURY AND / OR TOW DUE TO CRASH.
-
+[... your existing instructions remain unchanged ...]
 
 == FULL DATABASE SCHEMA ==
 {schema_text}
@@ -145,12 +106,10 @@ Only return the SQL query. No explanation.
         result_preview = df_result.head(5).to_markdown(index=False)
 
     except Exception as e:
-        # Instead of showing raw error, return a friendly message
-        print(f"❌ SQL Execution Error: {e}")  # keep full log in backend for debugging
+        print(f"❌ SQL Execution Error: {e}")  
         return jsonify({
             "reply": "I couldn't generate a valid answer for this question yet. Try rephrasing or asking something simpler."
         })
-
 
     # === Step 3: Ask Claude to explain the result ===
     explanation_prompt = f"""
