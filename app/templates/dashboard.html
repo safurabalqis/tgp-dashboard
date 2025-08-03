@@ -1,8 +1,26 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="text-center mt-5">
-    <h1>Welcome to the Olympic Dashboard</h1>
-    <p class="lead">Explore the traaffic crashes statistics by navigating through the menu.</p>
+{% extends "base.html" %} {% block content %}
+<div class="page-content">
+    <div class="text-center mt-5">
+        <h1
+            style="
+                color: #4338ca;
+                font-weight: 700;
+                margin-bottom: 10px;
+                font-family: 'Source Sans Pro', sans-serif;
+            ">
+            Welcome to the Dashboard
+        </h1>
+        <p class="lead">
+            Explore the traffic crashes statistics by navigating through the
+            menu.
+        </p>
+        <div class="slogan">“Insights That Drive Safer Journeys”</div>
+        <a
+            href="{{ url_for('location.location_landing') }}"
+            class="btn btn-purple btn-lg"
+            role="button">
+            View Location Overview
+        </a>
+    </div>
 </div>
 {% endblock %}
