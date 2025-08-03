@@ -1,11 +1,26 @@
-{% extends "base.html" %}
-{% block header %}Landing Page{% endblock %}
-{% block greeting %}a WorkInProgress team production{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="page-content">
-    <h2>Crash Reports Dashboard 🚗</h2>
-    <p>Explore detailed crash reports and analytics with CrashStat, a powerful tool designed to provide insights into traffic incidents and trends.</p>
-    <a href="{{ url_for('location.location_landing') }}" class="btn btn-primary">Go to Dashboard</a>
+    <div class="text-center mt-5">
+        <h1
+            style="
+                color: #4338ca;
+                font-weight: 700;
+                margin-bottom: 10px;
+                font-family: 'Source Sans Pro', sans-serif;
+            ">
+            Welcome to the Dashboard
+        </h1>
+        <p class="lead">
+            Explore the traffic crashes statistics by navigating through the
+            menu.
+        </p>
+        <div class="slogan">“Insights That Drive Safer Journeys”</div>
+        <a
+            href="{{ url_for('location.location_landing') }}"
+            class="btn btn-purple btn-lg"
+            role="button">
+            View Location Overview
+        </a>
+    </div>
 </div>
 {% endblock %}

@@ -4,9 +4,7 @@
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>
-            {% block title %}CrashStat{% endblock %}
-        </title>
+        <title>{% block title %}Crash Stats Dashboard{% endblock %}</title>
 
         <!-- Bootstrap CSS -->
         <link
@@ -72,13 +70,19 @@
                             >Crash Impact Analysis</a
                         >
                     </li>
-                    <li class="nav-item">
-                        <a href="/environment" class="nav-link"
+                    <li>
+                        <a
+                            href="{{ url_for('environment.environment_page') }}"
+                            class="nav-link"
                             >Environment Analysis</a
                         >
                     </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('chatbot.chatbot_ui') }}" class="nav-link">Chatbot</a>
+                    <li>
+                        <a
+                            href="{{ url_for('chatbot.chatbot_ui') }}"
+                            class="nav-link"
+                            >Chatbot</a
+                        >
                     </li>
                 </ul>
             </nav>
