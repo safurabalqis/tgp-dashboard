@@ -2,6 +2,45 @@
 {% block header %}Crash Impact Analysis{% endblock %}
 
 {% block content %}
+<style>
+    .card.hover-pop:hover {
+        transform: scale(1.04);
+        transition: transform 0.2s ease-in-out;
+        z-index: 10;
+    }
+
+    .card-body h6 {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .card-body p.display-6 {
+        font-size: 1.8rem;
+    }
+
+    .chart-container {
+        height: 400px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .page-content h5 {
+        font-size: 1.2rem;
+    }
+
+    .soft-card {
+        background: linear-gradient(145deg, #f0f4ff, #f8f9ff);
+        border: 1px solid #e0e7ff;
+        border-radius: 12px;
+    }
+
+    .shadow-sm {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
 <div class="page-content">
     <h2 class="mb-4">🏆 Crash Impact Analysis</h2>
 
@@ -20,11 +59,11 @@
     <!-- Injury Breakdown Cards -->
     <div class="injury-breakdown row g-4 mb-5">
         {% for injury, count in injury_breakdown.items() %}
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100 hover-shadow">
+        <div class="col-sm-6 col-md-4 col-lg-3">
+            <div class="card hover-pop soft-card shadow-sm h-100">
                 <div class="card-body text-center">
-                    <h6 class="card-title text-muted mb-2">{{ injury }}</h6>
-                    <p class="display-6 fw-bold text-primary">{{ count }}</p>
+                    <h6 class="card-title text-muted mb-1">{{ injury }}</h6>
+                    <p class="display-6 fw-bold text-primary mb-0">{{ count }}</p>
                 </div>
             </div>
         </div>
@@ -32,20 +71,20 @@
     </div>
 
     <!-- Bar + Pie Side by Side -->
-    <div class="row g-4 mb-5 align-items-center">
+    <div class="row g-4 mb-5">
         <div class="col-lg-6">
             <h5 class="mb-2">📊 Crash Severity Type</h5>
             <p>This chart shows how many crashes fall into each severity type.</p>
-            <div class="chart-container">
-                <canvas id="impactChart"></canvas>
+            <div class="soft-card shadow-sm p-3 chart-container">
+                <canvas id="impactChart" width="100%" height="100%"></canvas>
             </div>
         </div>
 
         <div class="col-lg-6">
             <h5 class="mb-2">🩹 Most Severe Injury</h5>
-            <p>This pie chart shows the distribution of the most severe injury in each crash.</p>
-            <div class="chart-container">
-                <canvas id="injuryChart"></canvas>
+            <p>This chart shows the distribution of the most severe injury.</p>
+            <div class="soft-card shadow-sm p-3 chart-container">
+                <canvas id="injuryChart" width="100%" height="100%"></canvas>
             </div>
         </div>
     </div>
@@ -54,12 +93,11 @@
 
     <!-- Crash Frequency Line Chart -->
     <h3>⏰ Crash Frequency by Hour of Day</h3>
-  <p>Understand when most crashes occur during the day (0–23 hours).</p>
-
-  {% if hour_insights %}
+    <p>Understand when most crashes occur during the day (0–23 hours).</p>
+    {% if hour_insights %}
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card border-info shadow-sm">
+            <div class="card hover-pop soft-card shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title">Most Frequent Hour</h6>
                     <p class="display-6 text-primary fw-bold">{{ hour_insights.most_frequent_hour }}</p>
@@ -67,7 +105,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-info shadow-sm">
+            <div class="card hover-pop soft-card shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title">Avg Crashes/Hour</h6>
                     <p class="display-6 text-success fw-bold">{{ hour_insights.avg_crash_hour }}</p>
@@ -75,7 +113,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-info shadow-sm">
+            <div class="card hover-pop soft-card shadow-sm">
                 <div class="card-body text-center">
                     <h6 class="card-title">Top 3 Hours</h6>
                     <p class="fw-bold">{{ hour_insights.top_hours | join(', ') }}</p>
@@ -83,10 +121,10 @@
             </div>
         </div>
     </div>
-  {% endif %}
-    <div class="chart-container" style="max-width: 1000px; margin: auto;">
-        <canvas id="hourChart"></canvas>
-    </div>
+    {% endif %}
+
+<div class="soft-card shadow-sm mb-5" style="padding: 1.5rem; max-width: 1000px; margin: auto; height: 400px;">
+    <canvas id="hourChart" style="width: 100% !important; height: 100% !important;"></canvas>
 </div>
 
 <!-- Chart.js Scripts -->
@@ -98,6 +136,7 @@
     const hour_counts = {{ hour_counts | tojson }};
     const injury_labels = {{ injury_labels | tojson }};
     const injury_values = {{ injury_values | tojson }};
+  
 </script>
 <script src="{{ url_for('static', filename='js/impact_charts.js') }}"></script>
 {% endblock %}

@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, jsonify, request
 from app.models.models import db, Crash
+from datetime import datetime
+
 
 impact_bp = Blueprint('impact', __name__)
 
@@ -61,6 +63,7 @@ def impact():
     total_crashes = query.count()
     total_injuries = sum(injury_values)
 
+    
     return render_template(
         'impact.html',
         labels=labels,
@@ -74,7 +77,8 @@ def impact():
         crash_type_options=crash_type_options,
         total_crashes=total_crashes,
         total_injuries=total_injuries,
-        hour_insights=hour_insights  # ✅ passed to template
+        hour_insights=hour_insights,
+       
     )
 
 
