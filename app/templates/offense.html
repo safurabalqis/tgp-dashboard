@@ -1,11 +1,11 @@
 {% extends "base.html" %} {% block content %}
-<div class="container">
-    <h1>Offense Type Analysis</h1>
+<div class="container-fluid">
+    <h1 class="mt-4">Offense Type Analysis</h1>
 
-    <!-- Filters -->
-    <div class="filters">
-        <label for="region-select">Beat:</label>
-        <select id="region-select">
+    <!-- Beat filter -->
+    <div class="mb-3">
+        <label for="region-select" class="form-label">Beat:</label>
+        <select id="region-select" class="form-select w-auto d-inline-block">
             <option value="all">All Beats</option>
             {% for b in beats %}
             <option value="{{ b }}">{{ b }}</option>
@@ -13,18 +13,43 @@
         </select>
     </div>
 
-    <!-- Chart Card -->
-    <div class="card">
-        <h2>Top Crash Causes</h2>
-        <canvas id="cause-chart"></canvas>
+    <!-- Row 1: Chart + Sankey side by side -->
+    <div class="row gy-4">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Top Crash Causes</div>
+                <div class="card-body">
+                    <canvas id="cause-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Cause → Severity Sankey</div>
+                <div class="card-body">
+                    <div
+                        id="sankey-chart"
+                        style="width: 100%; height: 400px"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Hit and Run Map  -->
-    <div id="map" style="height: 400px; margin-top: 2rem"></div>
+    <!-- Row 2: Map full-width (or you could split it too) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">Hit-and-Run Map</div>
+                <div class="card-body p-0">
+                    <div id="map" style="height: 500px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %} {% block scripts %}
 <script>
-    window.initialLabels = {{ labels|tojson }};
-    window.initialValues = {{ values|tojson }};
+    window.initialLabels={{ labels|tojson }};window.initialValues={{ values|tojson }};
 </script>
 {% endblock %}

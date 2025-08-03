@@ -3,7 +3,8 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
 from sqlalchemy import func
 from app.models.models import db, Crash
-import os
+import os, json
+
 
 offense_bp = Blueprint('offense', __name__, url_prefix='/offense')
 
@@ -127,3 +128,27 @@ def beat_choropleth_api():
         feat['properties']['hit_and_run_count'] = counts.get(int(beat_id), 0)
 
     return jsonify(geo)
+
+@offense_bp.route('/api/cause-severity')
+def cause_severity_api():
+    beat = request.args.get('beat', 'all')
+    q = db.session.query(
+        Crash.prim_contributory_cause.label('cause'),
+        Crash.most_severe_injury.label('severity'),
+        func.count(Crash.crash_record_id).label('count')
+    )
+    # hit only that beat if requested
+    if beat != 'all':
+        try:
+            q = q.filter(Crash.beat_of_occurrence == int(beat))
+        except ValueError:
+            pass
+
+    q = q.group_by(Crash.prim_contributory_cause, Crash.most_severe_injury)
+    data = [
+        {'cause': c or 'Unknown',
+         'severity': s or 'Unknown',
+         'count': cnt}
+        for c, s, cnt in q
+    ]
+    return jsonify(data)

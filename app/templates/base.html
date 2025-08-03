@@ -32,9 +32,10 @@
 
         <!-- Heatmap -->
         <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
     <body>
-        <div class="d-flex">
+        <div>
             <!-- Sidebar -->
             <nav class="sidebar">
                 <div class="sidebar-header">
@@ -54,7 +55,9 @@
                         >
                     </li>
                     <li>
-                        <a href="{{ url_for('impact.impact') }}" class="nav-link"
+                        <a
+                            href="{{ url_for('impact.impact') }}"
+                            class="nav-link"
                             >Crash impact Analysis</a
                         >
                     </li>
