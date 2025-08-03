@@ -9,20 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    env:
-    # 🔐 Secrets (fetched from GitHub)
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    DB_HOST: ${{ secrets.DB_HOST }}
-    DB_USER: ${{ secrets.DB_USER }}
-    DB_PASS: ${{ secrets.DB_PASS }}
-
-    # ✅ Safe non-secret values
-    AWS_REGION: ap-southeast-1
-    DB_NAME: postgres
-    DB_PORT: 5432
-    
+      
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
