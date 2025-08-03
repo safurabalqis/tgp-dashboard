@@ -21,42 +21,14 @@ app.register_blueprint(impact_bp)
 app.register_blueprint(location_bp)
 app.register_blueprint(environment_bp)
 
-# Sample Olympics data
-SAMPLE_DATA = {
-    'countries': 92,
-    'disciplines': 45,
-    'events': 288,
-    'medallists': 2053,
-    'athletes': 11113,
-    'medals_by_country': [
-        {'country': 'USA', 'gold': 40, 'silver': 44, 'bronze': 42, 'total': 126},
-        {'country': 'China', 'gold': 38, 'silver': 32, 'bronze': 21, 'total': 91},
-        {'country': 'Japan', 'gold': 20, 'silver': 12, 'bronze': 33, 'total': 65},
-        {'country': 'Australia', 'gold': 18, 'silver': 19, 'bronze': 27, 'total': 64},
-        {'country': 'France', 'gold': 16, 'silver': 26, 'bronze': 11, 'total': 53},
-        {'country': 'Netherlands', 'gold': 15, 'silver': 7, 'bronze': 23, 'total': 45},
-        {'country': 'Great Britain', 'gold': 14, 'silver': 22, 'bronze': 4, 'total': 40},
-        {'country': 'South Korea', 'gold': 13, 'silver': 9, 'bronze': 12, 'total': 34},
-        {'country': 'Italy', 'gold': 12, 'silver': 13, 'bronze': 8, 'total': 33},
-        {'country': 'Germany', 'gold': 12, 'silver': 13, 'bronze': 7, 'total': 32}
-    ]
-}
+
 
 @app.route('/')
 def dashboard():
     """Main dashboard page"""
-    return render_template('dashboard.html', data=SAMPLE_DATA)
-
-@app.route('/landing')
-def landing():
-    """Landing page"""
-    return render_template('landing.html')
+    return render_template('dashboard.html')
 
 
-@app.route('/environment')
-def environment():
-    """Environmental Analysis Page"""
-    return render_template('environment.html', data=SAMPLE_DATA)
 
 
 if __name__ == '__main__':
