@@ -4,6 +4,7 @@ from config import Config
 from app.models.models import db, Crash
 from app.routes.offense import offense_bp
 from app.routes.impact import impact_bp
+from app.routes.location import location_bp
 import json
 
 # Create Flask app with correct template and static folders
@@ -16,6 +17,7 @@ db.init_app(app)
 
 app.register_blueprint(offense_bp)
 app.register_blueprint(impact_bp)
+app.register_blueprint(location_bp)
 
 
 # Sample Olympics data

@@ -1,9 +1,46 @@
 {% extends "base.html" %}
-{% block header %}Landing Page{% endblock %}
+{% block header %}Location Overview{% endblock %}
+
 {% block content %}
 <div class="page-content">
-    <h2>🏠 Welcome to Traffic Crash 2024</h2>
-    <p>This is the Location (overview) Page Dashboard.</p>
-    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+    <h2>📊 Location Overview</h2>
+    <p>Explore data for crashes in Chicago:</p>
+
+    <!-- Summary cards -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="stat-icon">🚗</div>
+                <div class="stat-content">
+                    <h3 id="crash-count">0</h3>
+                    <p>Total Crashes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="stat-icon">📍</div>
+                <div class="stat-content">
+                    <h3>Locations</h3>
+                    <p>Interactive Map</p>
+                </div>
+            </div>
+        </div>
+    
+        
+    <!-- Heatmap -->
+    <h2 style="margin-top: 2rem;">📍 Crash Density Map</h2>
+    <div id="map" style="height: 500px;"></div>
+
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Leaflet + Heatmap plugin -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script src="{{ url_for('static', filename='js/location.js') }}"></script>
 {% endblock %}
