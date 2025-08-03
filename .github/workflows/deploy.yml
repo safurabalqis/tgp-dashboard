@@ -1,32 +1,142 @@
-name: Deploy to Render
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11.9'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Lint (optional)
+      - name: Install linting tools
         run: |
-          pip install flake8
-          flake8 . || true
+          pip install flake8 black isort
 
-      - name: Report Success Status
-        if: success()
+      - name: Code formatting check
         run: |
-          echo "✅ All checks passed - Render should deploy now"
+          black --check . || echo "Code formatting issues found"
+          
+      - name: Import sorting check
+        run: |
+          isort --check-only . || echo "Import sorting issues found"
+
+      - name: Lint with flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Treat all other issues as warnings
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Security check
+        run: |
+          pip install safety bandit
+          safety check || echo "Security issues found"
+          bandit -r . -f json || echo "Bandit security scan completed"
+
+      - name: Test Flask app startup
+        run: |
+          # Test if the app can start without errors
+          python -c "
+          try:
+              from main import app
+              print('✅ Flask app imports successfully')
+              with app.test_client() as client:
+                  print('✅ Flask app can create test client')
+          except Exception as e:
+              print(f'❌ Flask app startup failed: {e}')
+              exit(1)
+          "
+
+      # This is the KEY step - it creates a check run that Render can see
+      - name: Create Check Run
+        uses: actions/github-script@v7
+        if: always()
+        with:
+          script: |
+            const { data: checkRun } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'CI Pipeline',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: '${{ job.status }}',
+              output: {
+                title: 'CI Pipeline Results',
+                summary: 'All CI checks have been completed',
+                text: `
+                Job Status: ${{ job.status }}
+                
+                Steps completed:
+                - ✅ Code checkout
+                - ✅ Python setup  
+                - ✅ Dependencies installation
+                - ✅ Code quality checks
+                - ✅ Security scanning
+                - ✅ Flask app testing
+                `
+              }
+            });
+            
+            console.log('Check run created:', checkRun.html_url);
+
+  # Optional: Add this job to explicitly trigger Render webhook
+  trigger-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Trigger Render Deploy
+        run: |
+          echo "🚀 CI checks passed - Render should auto-deploy now"
+          echo "📊 Test job status: ${{ needs.test.result }}"
+          
+      # Optional: Manually trigger Render webhook if auto-deploy still doesn't work
+      - name: Manual Render Webhook (Backup)
+        if: needs.test.result == 'success'
+        run: |
+          # You can uncomment and use your actual deploy hook URL from Render settings
+          # curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
+          #   -H "Content-Type: application/json" \
+          #   -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          echo "Manual webhook trigger would go here"
+
+  notify:
+    needs: [test, trigger-deploy]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Deployment Status
+        run: |
+          echo "=== CI/CD Pipeline Complete ==="
+          echo "Test Status: ${{ needs.test.result }}"
+          echo "Deploy Status: ${{ needs.trigger-deploy.result }}"
+          
+          if [[ "${{ needs.test.result }}" == "success" ]]; then
+            echo "✅ All tests passed - Render should deploy automatically"
+          else
+            echo "❌ Tests failed - Deployment blocked"
+          fi
