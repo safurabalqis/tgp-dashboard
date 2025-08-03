@@ -61,11 +61,10 @@
                             >Crash impact Analysis</a
                         >
                     </li>
-                    <li>
-                        <a href="{{ url_for('sports') }}" class="nav-link"
-                            >Environmental risks Analysis</a
-                        >
+                    <li class="nav-item">
+                        <a href="/environment" class="nav-link">Environment Analysis</a>
                     </li>
+
                 </ul>
             </nav>
 
@@ -79,7 +78,7 @@
                                 {% block header %}Welcome to Traffic Crash 2024
                                 Dashboard{% endblock %}
                             </h1>
-                            <p class="text-muted">Hello</p>
+                            <p class="text-muted">{% block greeting %}Hello{% endblock %}</p>
                         </div>
                         <div class="user-info">
                             <span class="text-muted"
