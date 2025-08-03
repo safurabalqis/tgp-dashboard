@@ -8,9 +8,9 @@ print("Files in directory:", [f for f in os.listdir('.') if f.endswith('.py')])
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    import App
+    import main
     print("Successfully imported App module")
-    from App import app
+    from main import app
     print("Successfully imported app from App")
 except Exception as e:
     print(f"Import failed: {e}")
