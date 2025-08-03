@@ -2,45 +2,83 @@
 {% block header %}Location Overview{% endblock %}
 
 {% block content %}
-<div class="page-content">
-    <h2>📊 Location Overview</h2>
-    <p>Explore data for crashes in Chicago:</p>
+<div class="page-content mb-4">
+    <h2>📊 Key Insights</h2>
+    <p>Traffic crashes in Chicago, 2024</p>
 
     <!-- Summary cards -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-icon">🚗</div>
-                <div class="stat-content">
-                    <h3 id="crash-count">0</h3>
-                    <p>Total Crashes</p>
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Left Column: Total Crashes -->
+            <div class="col-md-4">
+                <div class="stat-card text-center p-4 shadow-sm border rounded h-100">
+                    <div class="stat-icon display-4 mb-2">🚗</div>
+                    <div class="stat-content">
+                        <h3>{{ "{:,}".format(stats.total_crashes) }}</h3>
+                        <p class="text-muted">Total Crashes</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="stat-card">
-                <div class="stat-icon">📍</div>
-                <div class="stat-content">
-                    <h3>Locations</h3>
-                    <p>Interactive Map</p>
-                </div>
-            </div>
-        </div>
     
-        
-    <!-- Heatmap -->
-    <h2 style="margin-top: 2rem;">📍 Crash Density Map</h2>
-    <div id="map" style="height: 500px;"></div>
+            <!-- Right Column: Most Crashes Insights -->
+            <div class="col-md-8">
+                <h5 class="mb-3"><strong><u>MOST COMMON CASES</u></strong></h5>
+                <div class="row">
+                    <!-- Most Common Month -->
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card text-center p-3 shadow-sm border rounded">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <p class="text-muted">Month</p>
+                                <h5>{{ stats.top_month | title }}</h5>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Most Common Weather -->
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card text-center p-3 shadow-sm border rounded">
+                            <div class="stat-icon">⛅</div>
+                            <div class="stat-content">
+                                <p class="text-muted">Weather</p>
+                                <h5>{{ stats.top_weather | title }}</h5>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Most Common Crash Type -->
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-card text-center p-3 shadow-sm border rounded">
+                            <div class="stat-icon">💥</div>
+                            <div class="stat-content">
+                                <p class="text-muted">Reason</p>
+                                <h5>{{ stats.top_crash_type | title }}</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="page-content">
+    <!-- Search Section -->
+    <div class="container mt-5">
+        <h3>🔍 Search Crash Records by Street</h3>
+        <input
+            type="text"
+            id="search-input"
+            class="form-control mb-3"
+            placeholder="Enter street name..." />
+
+    <div id="search-results" class="list-group"></div>
 
 </div>
 
 {% endblock %}
 
 {% block scripts %}
-<!-- Leaflet + Heatmap plugin -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
-
 <script src="{{ url_for('static', filename='js/location.js') }}"></script>
 {% endblock %}

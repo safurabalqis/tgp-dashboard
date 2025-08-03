@@ -32,6 +32,9 @@
 
         <!-- Heatmap -->
         <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     </head>
     <body>
         
@@ -42,8 +45,8 @@
                 </div>
                 <ul class="sidebar-nav">
                     <li>
-                        <a href="{{ url_for('landing') }}" class="nav-link"
-                            >Location Overview Page</a
+                        <a href="{{ url_for('location.location_landing') }}" class="nav-link"
+                            >Location Overview</a
                         >
                     </li>
                     <li>
@@ -76,7 +79,7 @@
                                 {% block header %}Welcome to Traffic Crash 2024
                                 Dashboard{% endblock %}
                             </h1>
-                            <p class="text-muted">Hello</p>
+                            <!-- <p class="text-muted">Hello</p> -->
                         </div>
                         <div class="user-info">
                             <span class="text-muted"

@@ -1,19 +1,46 @@
 // static/js/location.js
 
 document.addEventListener("DOMContentLoaded", () => {
-    const map = L.map("map").setView([41.8781, -87.6298], 11);
+    const input = document.getElementById("search-input");
+    const resultBox = document.getElementById("search-results");
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
-    }).addTo(map);
+    input.addEventListener("input", () => {
+        const query = input.value.trim();
 
-    fetch("/location/api/heatmap")
-        .then((res) => res.json())
-        .then((data) => {
-            L.heatLayer(data, {
-                radius: 15,
-                blur: 25,
-                maxZoom: 17,
-            }).addTo(map);
-        });
+        if (query.length < 2) {
+            resultBox.innerHTML = "";
+            return;
+        }
+
+        fetch(`/location/api/search?q=${encodeURIComponent(query)}`)
+            .then((res) => res.json())
+            .then((data) => {
+                resultBox.innerHTML = "";
+
+                if (data.length === 0) {
+                    resultBox.innerHTML = `<div class="list-group-item">No crashes found in this location</div>`;
+                    return;
+                }
+
+                data.forEach((crash) => {
+                    const item = document.createElement("div");
+                    item.className = "list-group-item";
+
+                    item.innerHTML = `
+                        <strong>Crash ID:</strong> ${crash.id}<br>
+                        <strong>Date:</strong> ${formatDate(crash.date)}<br>
+                        <strong>Reason:</strong> ${crash.reason}<br>
+                        <strong>Injuries:</strong> ${crash.injuries || 0}<br>
+                        <strong>Vehicles Involved:</strong> ${crash.vehicles}
+                    `;
+
+                    resultBox.appendChild(item);
+                });
+            });
+    });
 });
+
+function formatDate(rawDate) {
+    const [y, m, d] = rawDate.split("-");
+    return `${d}/${m}/${y}`;
+}

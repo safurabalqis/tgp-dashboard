@@ -533,3 +533,11 @@ body {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
+/* Search bar in Location Overview */
+#search-results .list-group-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+}
