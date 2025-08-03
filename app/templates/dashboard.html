@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% block header %}Landing Page{% endblock %}
+{% block greeting %}a WorkInProgress team production{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-    <h1>Welcome to the Olympic Dashboard</h1>
-    <p class="lead">Explore the traaffic crashes statistics by navigating through the menu.</p>
+<div class="page-content">
+    <h2>Crash Reports Dashboard 🚗</h2>
+    <p>Explore detailed crash reports and analytics with CrashStat, a powerful tool designed to provide insights into traffic incidents and trends.</p>
+    <a href="{{ url_for('location.location_landing') }}" class="btn btn-primary">Go to Dashboard</a>
 </div>
 {% endblock %}

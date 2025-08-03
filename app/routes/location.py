@@ -3,16 +3,17 @@
 from flask import Blueprint, render_template, jsonify, request
 from sqlalchemy import func
 from app.models.models import db, Crash
+import calendar
 
-location_bp = Blueprint('location', __name__, url_prefix='/location')
+location_bp = Blueprint("location", __name__, url_prefix="/location")
 
-# Cards overview
-@location_bp.route('')
+# --------------------------------
+# Landing Summary Cards
+# --------------------------------
+@location_bp.route("")
 def location_landing():
-    # Total crashes = count of crash_record_id
     total_crashes = db.session.query(func.count(Crash.crash_record_id)).scalar()
 
-    # Most common month
     top_month_num = (
         db.session.query(Crash.crash_month, func.count().label("count"))
         .group_by(Crash.crash_month)
@@ -21,7 +22,6 @@ def location_landing():
     )
     top_month = month_name(top_month_num[0]) if top_month_num else "N/A"
 
-    # Most common weather (ignoring 'UNKNOWN' or null)
     top_weather = (
         db.session.query(Crash.weather_condition, func.count().label("count"))
         .filter(Crash.weather_condition.isnot(None))
@@ -32,17 +32,15 @@ def location_landing():
     )
     top_weather = top_weather[0] if top_weather else "N/A"
 
-    # Most common crash type (excluding 'UNKNOWN')
     top_crash_type = (
         db.session.query(Crash.prim_contributory_cause, func.count().label("count"))
         .filter(Crash.prim_contributory_cause.isnot(None))
-        .filter(Crash.prim_contributory_cause != "UNKNOWN")
+        .filter(Crash.prim_contributory_cause != "UNABLE TO DETERMINE")
         .group_by(Crash.prim_contributory_cause)
         .order_by(func.count().desc())
         .first()
     )
     top_crash_type = top_crash_type[0] if top_crash_type else "N/A"
-
 
     return render_template(
         "landing.html",
@@ -54,45 +52,53 @@ def location_landing():
         },
     )
 
+
 def month_name(num):
-    import calendar
     if num and 1 <= num <= 12:
         return calendar.month_name[num]
-    return "Unknown"
+    else: return "Unknown"
 
-# Search bar results list
-@location_bp.route('/api/search')
-def search_crashes():
+# --------------------------------
+# Street search
+# --------------------------------
+@location_bp.route("/api/streets")
+def search_streets():
+    query = request.args.get("q", "").lower()
+    metric = request.args.get("metric", "crashes")
 
-    query = request.args.get("q", "").strip().lower()
-    print(f"Received query: {query}")
-    results = []
+    if not query:
+        return jsonify([])
 
-    if query:
-        matched = (
-            db.session.query(
-                Crash.crash_record_id,
-                Crash.crash_date,
-                Crash.prim_contributory_cause,
-                Crash.injuries_total,
-                Crash.num_units,
-                Crash.street_name,
-            )
-            .filter(Crash.street_name.ilike(f"%{query}%"))
-            .order_by(Crash.crash_date.desc())
-            .limit(50)
-            .all()
+    # Determine which metric to sum
+    if metric == "injuries":
+        value_column = func.sum(Crash.injuries_total).label("value")
+    elif metric == "vehicles":
+        value_column = func.sum(Crash.num_units).label("value")
+    else:
+        value_column = func.count().label("value")
+
+    streets = (
+        db.session.query(
+            Crash.street_name,
+            func.avg(Crash.latitude).label("lat"),
+            func.avg(Crash.longitude).label("lng"),
+            value_column
         )
+        .filter(Crash.street_name.ilike(f"%{query}%"))
+        .filter(Crash.latitude.isnot(None), Crash.longitude.isnot(None))
+        .group_by(Crash.street_name)
+        .order_by(value_column.desc())
+        .limit(10)
+        .all()
+    )
 
-        for crash in matched:
-            results.append({
-                "id": crash.crash_record_id,
-                "date": crash.crash_date.split("T")[0],  # assuming ISO format
-                "reason": crash.prim_contributory_cause.title(),
-                "injuries": crash.injuries_total,
-                "vehicles": crash.num_units,
-                "street": crash.street_name,
-            })
+    result = [
+        {
+            "name": name.title(),
+            "coords": [lat, lng],
+            "crash_count": int(value)
+        }
+        for name, lat, lng, value in streets if lat and lng
+    ]
 
-    return jsonify(results)
-
+    return jsonify(result)

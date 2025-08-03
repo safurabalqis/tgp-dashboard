@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}" />
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>
-            {% block title %}Traffic Crash 2024 Dashboard{% endblock %}
+            {% block title %}CrashStat{% endblock %}
         </title>
 
         <!-- Bootstrap CSS -->
@@ -47,7 +48,7 @@
             <!-- Sidebar -->
             <nav class="sidebar">
                 <div class="sidebar-header">
-                    <h3>Traffic Crash 2024</h3>
+                    <h3><a href="{{ url_for('dashboard') }}" class="text-decoration-none">CrashStat</a></h3>
                 </div>
                 <ul class="sidebar-nav">
                     <li>
@@ -68,7 +69,7 @@
                         <a
                             href="{{ url_for('impact.impact') }}"
                             class="nav-link"
-                            >Crash impact Analysis</a
+                            >Crash Impact Analysis</a
                         >
                     </li>
                     <li class="nav-item">
@@ -95,13 +96,6 @@
                             <p class="text-muted">
                                 {% block greeting %}Hello{% endblock %}
                             </p>
-                        </div>
-                        <div class="user-info">
-                            <span class="text-muted"
-                                ><TGP-Paynet></TGP-Paynet
-                            ></span>
-                            <span class="text-muted">tgp@gmail.com</span>
-                            <div class="user-avatar">👤</div>
                         </div>
                     </div>
                 </header>

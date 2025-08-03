@@ -626,9 +626,19 @@ body {
 
 
 /* Search bar in Location Overview */
-#search-results .list-group-item {
-    padding: 0.75rem 1rem;
-    border-radius: 0.25rem;
-    border: 1px solid #ddd;
-    margin-bottom: 0.5rem;
+.alert-custom{
+    background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white */
 }
+
+.search-result-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    transition: all 0.2s ease;
+}
+
+.search-result-item:hover {
+    background-color: #f0f8ff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transform: scale(1.01);
+}
+
