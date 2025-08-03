@@ -61,6 +61,6 @@ def chart_data():
     return jsonify(SAMPLE_DATA['medals_by_country'])
 
 if __name__ == '__main__':
-    print("🚀 Starting Olympics Dashboard...")
+    print("🚀 Starting Traffic Crash Dashboard...")
     print("📍 Dashboard will be available at: http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)

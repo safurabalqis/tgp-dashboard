@@ -1,6 +1,6 @@
 // Dashboard JavaScript functionality
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Olympics Dashboard loaded successfully!');
+    console.log('Traffic Crash 2024 loaded successfully!');
     
     // Add active class to current navigation item
     const currentPath = window.location.pathname;
