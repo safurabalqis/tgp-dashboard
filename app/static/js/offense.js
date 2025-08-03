@@ -1,7 +1,7 @@
 // static/js/offense.js
 
 // grab DOM nodes & globals
-let beatSelect, ctx, causeChart, map, markerCluster;
+let beatSelect, ctx, causeChart, map, markerCluster, resetBtn;
 
 function initChart() {
     causeChart = new Chart(ctx, {
@@ -19,6 +19,7 @@ function initChart() {
         options: {
             indexAxis: "y",
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: { title: { display: true, text: "Count" } },
                 y: { title: { display: true, text: "Cause" } },
@@ -61,8 +62,8 @@ function initMap() {
     map.addLayer(markerCluster);
 }
 
-function fetchAndDraw() {
-    const beat = encodeURIComponent(beatSelect.value);
+function fetchAndDraw(overrideBeat = null) {
+    const beat = encodeURIComponent(overrideBeat ?? beatSelect.value);
 
     // 1) Update chart
     fetch(`/offense/api/primary-cause?beat=${beat}`)
@@ -139,65 +140,114 @@ function buildSankeyData(rows, topN = 6) {
     return { nodes, links };
 }
 
-// (B) Fetch & render Sankey for a given beat
 function fetchAndDrawSankey(beat, singleCause = null) {
-    fetch(`/offense/api/cause-severity?beat=${beat}`)
+    fetch(`/offense/api/cause-severity?beat=${encodeURIComponent(beat)}`)
         .then((r) => r.json())
         .then((rows) => {
-            // if drilling down to one cause, filter now:
+            // 1) optionally drill down to a single cause
             const filtered = singleCause
                 ? rows.filter((r) => r.cause === singleCause)
                 : rows;
 
-            // pass 6 to show top 6 + “Other”
+            // 2) build top-6+Other nodes & links
             const { nodes, links } = buildSankeyData(filtered, 6);
 
-            Plotly.react(
-                "sankey-chart",
-                [
-                    {
-                        type: "sankey",
-                        orientation: "h",
-                        node: {
-                            label: nodes,
-                            pad: 25, // more padding
-                            thickness: 20,
-                            line: { color: "black", width: 0.5 },
-                        },
-                        link: {
-                            source: links.map((l) => l.source),
-                            target: links.map((l) => l.target),
-                            value: links.map((l) => l.value),
-                        },
-                    },
-                ],
+            // 3) prepare Plotly sankey trace
+            const data = [
                 {
-                    title: "Primary Cause → Crash Severity",
-                    height: 600, // taller canvas
-                    margin: { t: 50, l: 20, r: 20, b: 20 },
+                    type: "sankey",
+                    orientation: "h",
+                    node: {
+                        label: nodes,
+                        pad: 25,
+                        thickness: 20,
+                        line: { color: "black", width: 0.5 },
+                    },
+                    link: {
+                        source: links.map((l) => l.source),
+                        target: links.map((l) => l.target),
+                        value: links.map((l) => l.value),
+                    },
                 },
-            );
-        });
+            ];
+
+            // 4) autosize layout (no fixed width/height)
+            const layout = {
+                autosize: true,
+                margin: { t: 50, l: 20, r: 20, b: 20 },
+            };
+
+            // 5) tell Plotly to watch for container resizes
+            const config = { responsive: true };
+
+            // 6) draw & then force an immediate resize pass
+            Plotly.react("sankey-chart", data, layout, config).then(() => {
+                Plotly.Plots.resize(document.getElementById("sankey-chart"));
+            });
+        })
+        .catch((err) => console.error("Sankey load error:", err));
+}
+
+function fetchSummary(beat = "all") {
+    fetch(`/offense/api/primary-cause?beat=${encodeURIComponent(beat)}`)
+        .then((r) => r.json())
+        .then((data) => {
+            const top = data[0] || { cause: "—", count: 0 };
+            document.getElementById("summary-top-cause").innerText = `${
+                top.cause
+            } (${top.count.toLocaleString()})`;
+        })
+        .catch(console.error);
+
+    fetch(`/offense/api/most-hit-and-run-beat`)
+        .then((r) => r.json())
+        .then(({ beat, count }) => {
+            document.getElementById(
+                "summary-top-hitrun",
+            ).innerText = `${beat} (${count.toLocaleString()})`;
+        })
+        .catch(console.error);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     beatSelect = document.getElementById("region-select");
     ctx = document.getElementById("cause-chart").getContext("2d");
+    resetBtn = document.getElementById("reset-filters");
 
     initChart();
     initMap();
 
     // initial load
     fetchAndDraw();
-
-    // initial sankey (all causes)
+    fetchSummary();
     fetchAndDrawSankey("all");
+
+    // 2) Wire up Choices.js on the beat dropdown
+    const beatChoices = new Choices("#region-select", {
+        searchEnabled: true,
+        shouldSort: false,
+        placeholder: true,
+        placeholderValue: "All Beats",
+        itemSelectText: "", // removes the “Press to select” text
+        position: "bottom", // dropdown opens below
+        removeItemButton: true, // not strictly needed for single-select
+    });
 
     // when the beat changes, redraw both
     beatSelect.addEventListener("change", () => {
         const b = beatSelect.value;
+        fetchSummary(b);
         fetchAndDraw(); // chart + map
         fetchAndDrawSankey(b); // sankey default
+    });
+
+    resetBtn.addEventListener("click", () => {
+        beatSelect.value = "all";
+        beatChoices.setChoiceByValue("all");
+
+        fetchAndDraw("all");
+        fetchAndDrawSankey("all");
+        fetchSummary("all");
     });
 
     // drill-down on bar click
