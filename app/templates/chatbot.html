@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}Chatbot{% endblock %}
+{% block header %}Traffic Crash Chatbot{% endblock %}
+{% block greeting %}Ask questions and get instant insights{% endblock %}
+
+{% block content %}
+<style>
+/* Chat container */
+.chat-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 0;
+}
+.chat-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+    width: 1200px;
+}
+
+/* Messages */
+.messages {
+    height: 700px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    margin-bottom: 15px;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+.msg {
+    margin-bottom: 14px;
+    max-width: 85%;
+}
+.msg.user {
+    text-align: right;
+    align-self: flex-end;
+}
+.msg.user .bubble {
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 8px 8px 0 8px;
+}
+.msg.bot {
+    text-align: left;
+    align-self: flex-start;
+}
+.msg.bot .bubble {
+    background: #f3f4f6;
+    color: #111827;
+    border-radius: 8px 8px 8px 0;
+}
+
+/* Bubble style */
+.bubble {
+    display: inline-block;
+    padding: 10px 14px;
+    font-size: 15px;
+    line-height: 1.4;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* SQL preview card */
+.sql-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #374151;
+}
+.sql-card code {
+    display: block;
+    background: #f3f4f6;
+    padding: 6px;
+    border-radius: 4px;
+    margin: 4px 0;
+    white-space: pre-wrap;
+}
+
+/* Pre-written prompt buttons */
+.prompt-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.prompt-btn {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+}
+.prompt-btn:hover {
+    background: #e5e7eb;
+}
+
+/* Input row */
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+}
+button {
+    padding: 10px 16px;
+    border: none;
+    background: #4f46e5;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+button:disabled {
+    background: #9ca3af;
+}
+</style>
+
+<div class="chat-wrapper">
+    <div class="chat-card">
+        <h4 class="mb-3 text-center">💬 Chatbot</h4>
+
+        <!-- Pre-written prompts -->
+        <div class="prompt-row">
+            <button class="prompt-btn" onclick="sendPrompt('What are the top months with most crashes?')">Top crash months</button>
+            <button class="prompt-btn" onclick="sendPrompt('Which weather conditions cause the most crashes?')">Weather impact</button>
+            <button class="prompt-btn" onclick="sendPrompt('Which intersections have the most crashes?')">Dangerous intersections</button>
+            <button class="prompt-btn" onclick="sendPrompt('How many crashes happened at night?')">Night crashes</button>
+        </div>
+
+        <div class="messages d-flex flex-column" id="messages"></div>
+        <div class="input-row">
+            <input type="text" id="messageInput" placeholder="Type your question..." />
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const messagesDiv = document.getElementById('messages');
+const input = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+function appendMessage(text, sender, sql = null, preview = null) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `msg ${sender}`;
+    
+    // Bubble content
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerText = text;
+
+    // SQL + preview card (bot only)
+    if (sender === 'bot' && (sql || preview)) {
+        const sqlCard = document.createElement('div');
+        sqlCard.className = 'sql-card';
+        if (sql) sqlCard.innerHTML += `<strong>SQL:</strong><code>${sql}</code>`;
+        if (preview) sqlCard.innerHTML += `<strong>Preview:</strong><code>${preview}</code>`;
+        bubble.appendChild(sqlCard);
+    }
+
+    wrapper.appendChild(bubble);
+    messagesDiv.appendChild(wrapper);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return wrapper;
+}
+
+async function sendMessage() {
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage(message, 'user');
+    input.value = '';
+    sendBtn.disabled = true;
+
+    const thinkingMsg = appendMessage("Thinking...", 'bot');
+
+    try {
+        const res = await fetch('/api/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+
+        // Replace "Thinking..." with actual response
+        thinkingMsg.querySelector('.bubble').innerText = data.reply || 'No response';
+
+        // Add SQL preview if exists
+        if (data.sql || data.sql_result_preview) {
+            appendMessage(data.reply, 'bot', data.sql, data.sql_result_preview);
+            thinkingMsg.remove();
+        }
+    } catch (err) {
+        thinkingMsg.querySelector('.bubble').innerText = '⚠️ Error contacting chatbot';
+    } finally {
+        sendBtn.disabled = false;
+    }
+}
+
+// Pre-written prompt function
+function sendPrompt(text) {
+    input.value = text;
+    sendMessage();
+}
+
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+</script>
+{% endblock %}
