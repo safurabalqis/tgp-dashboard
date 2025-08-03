@@ -623,3 +623,13 @@ body {
   font-size:     1.2rem;
   font-family:   'Source Sans Pro', sans-serif;
 }
+
+    }
+
+/* Search bar in Location Overview */
+#search-results .list-group-item {
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+}

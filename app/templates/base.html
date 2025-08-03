@@ -32,7 +32,10 @@
 
         <!-- Heatmap -->
         <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      
         <!-- Choices.js CSS -->
         <link
             rel="stylesheet"
@@ -40,6 +43,7 @@
 
         <!-- Choices.js JS -->
         <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     </head>
     <body>
         <div>
@@ -50,8 +54,8 @@
                 </div>
                 <ul class="sidebar-nav">
                     <li>
-                        <a href="{{ url_for('landing') }}" class="nav-link"
-                            >Location (overview) Page</a
+                        <a href="{{ url_for('location.location_landing') }}" class="nav-link"
+                            >Location Overview</a
                         >
                     </li>
                     <li>
