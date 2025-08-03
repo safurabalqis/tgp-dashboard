@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, jsonify, request
 from sqlalchemy import func
-from app.models.models import db, Crash
+from main.models.models import db, Crash
 
 location_bp = Blueprint('location', __name__, url_prefix='/location')
 
