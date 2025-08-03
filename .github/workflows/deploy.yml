@@ -114,14 +114,10 @@ jobs:
           echo "📊 Test job status: ${{ needs.test.result }}"
           
       # Optional: Manually trigger Render webhook if auto-deploy still doesn't work
-      - name: Manual Render Webhook (Backup)
+      - name: Trigger Render Deploy (via Deploy Hook)
         if: needs.test.result == 'success'
         run: |
-          # You can uncomment and use your actual deploy hook URL from Render settings
-          # curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
-          #   -H "Content-Type: application/json" \
-          #   -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
-          echo "Manual webhook trigger would go here"
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   notify:
     needs: [test, trigger-deploy]
