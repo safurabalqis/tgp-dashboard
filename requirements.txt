@@ -6,7 +6,8 @@ Werkzeug==3.0.1
 folium==0.15.1
 psycopg2-binary==2.9.9   # for PostgreSQL (RDS connection)
 Jinja2==3.1.2   
-gunicorn==21.2.0          # template engine (Flask uses this)
+gunicorn==21.2.0 
+python-dotenv       # template engine (Flask uses this)
 
 # Front-end (loaded via CDN, not installed via pip)
 # chart.js
