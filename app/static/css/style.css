@@ -603,3 +603,23 @@ body {
   border: 1px solid #ced4da !important;
   border-radius: .375rem !important;
 }
+
+.filter-label {
+    color: #4338ca;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+#offense-page h1,
+#offense-page h2,
+#offense-page h3,
+#offense-page h4,
+#offense-page h5,
+#offense-page h6 {
+  color:         #4338ca;
+  font-weight:   700;
+  font-size:     1.2rem;
+  font-family:   'Source Sans Pro', sans-serif;
+}
