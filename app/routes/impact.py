@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
-from main.models.models import db, Crash
+from app.models.models import db, Crash
 from datetime import datetime
 
 

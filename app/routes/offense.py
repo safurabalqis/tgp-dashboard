@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, request, jsonify, current_app
 from sqlalchemy import func
-from main.models.models import db, Crash
+from app.models.models import db, Crash
 import os, json
 
 

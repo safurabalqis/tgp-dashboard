@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 from config import Config
-from main.models.models import db, Crash
-from main.routes.offense import offense_bp
-from main.routes.impact import impact_bp
-from main.routes.location import location_bp
-from main.routes.environment import environment_bp
+from app.models.models import db, Crash
+from app.routes.offense import offense_bp
+from app.routes.impact import impact_bp
+from app.routes.location import location_bp
+from app.routes.environment import environment_bp
 import json
 
 # Create Flask app with correct template and static folders
