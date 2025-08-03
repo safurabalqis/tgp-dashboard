@@ -450,88 +450,180 @@ body {
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Style for Offense Type Page */
 
-  .container {
-      max-width: 1200px;
-      margin: 1rem auto;
-      padding: 0 1rem;
-    }
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .filters label {
-      font-weight: bold;
-    }
-    .filters input,
-    .filters select {
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .filters button {
-      padding: 0.6rem 1rem;
-      background: var(--primary-color);
-      border: none;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .filters button:hover {
-      background: #217dbb;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
-    }
-    .card {
-      background: var(--card-bg);
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-    }
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.2rem;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.5rem;
-    }
-    .small-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    .small-table th,
-    .small-table td {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-    #hitrun-map {
-      height: 300px;
-      border-radius: 4px;
-    }
-    .flex-charts {
+.container {
+    max-width: 1200px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+}
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.filters label {
+    font-weight: bold;
+}
+.filters input,
+.filters select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.filters button {
+    padding: 0.6rem 1rem;
+    background: var(--primary-color);
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.filters button:hover {
+    background: #217dbb;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+.card {
+    background: var(--card-bg);
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+}
+.card h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+.small-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+.small-table th,
+.small-table td {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 0.9rem;
+}
+#hitrun-map {
+    height: 300px;
+    border-radius: 4px;
+}
+.flex-charts {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
     align-items: flex-start;
     }
-    .chart-container {
+.chart-container {
     background: #fff;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#sankey-chart {
+/* fill its parent’s width and height */
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+}
+.card-body > #sankey-chart {
+/* let the card determine the height */
+    min-height: 300px;
+}
+
+.chart-wrapper {
+  position: relative;  /* needed by Chart.js responsive resizing */
+}
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+#offense-page .card, .card-body {
+  overflow: visible !important;
+}
+
+.choices__list--dropdown {
+  position: absolute;  /* ensure it’s removed from flow */
+  z-index: 2000;       /* above Bootstrap’s modals (1050) */
+}
+
+.choices {
+  position: relative;
+}
+
+/* constrain the Beat choices widget to 200px */
+.select-container .choices__inner {
+  width: 200px !important;
+  min-width: 200px;
+}
+
+/* make sure the dropdown itself stays at least that wide */
+.select-container .choices__list--dropdown {
+  min-width: 200px !important;
+}
+
+/* ensure overflow is visible so the dropdown can expand */
+.select-container {
+  position: relative;
+  overflow: visible;
+}
+
+/* only target the Beat widget (we wrapped it in .beat-select-container) */
+.select-container .choices__inner {
+  /* copy Bootstrap form-select styles */
+  display: block;
+  width: 100%;
+  height: calc(2.5rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .375rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+/* dropdown panel too */
+.select-container .choices__list--dropdown {
+  border: 1px solid #ced4da !important;
+  border-radius: .375rem !important;
+}
+
+.filter-label {
+    color: #4338ca;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+#offense-page h1,
+#offense-page h2,
+#offense-page h3,
+#offense-page h4,
+#offense-page h5,
+#offense-page h6 {
+  color:         #4338ca;
+  font-weight:   700;
+  font-size:     1.2rem;
+  font-family:   'Source Sans Pro', sans-serif;
+}
+
     }
 
 /* Search bar in Location Overview */

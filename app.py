@@ -5,6 +5,7 @@ from app.models.models import db, Crash
 from app.routes.offense import offense_bp
 from app.routes.impact import impact_bp
 from app.routes.location import location_bp
+from app.routes.environment import environment_bp
 import json
 
 # Create Flask app with correct template and static folders
@@ -18,6 +19,7 @@ db.init_app(app)
 app.register_blueprint(offense_bp)
 app.register_blueprint(impact_bp)
 app.register_blueprint(location_bp)
+app.register_blueprint(environment_bp)
 
 
 # Sample Olympics data
@@ -52,10 +54,10 @@ def landing():
     return render_template('landing.html')
 
 
-@app.route('/sports')
-def sports():
-    """Sports analysis page"""
-    return render_template('sports.html', data=SAMPLE_DATA)
+@app.route('/environment')
+def environment():
+    """Environmental Analysis Page"""
+    return render_template('environment.html', data=SAMPLE_DATA)
 
 @app.route('/api/chart-data')
 def chart_data():

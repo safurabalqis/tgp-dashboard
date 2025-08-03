@@ -3,11 +3,12 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
 from sqlalchemy import func
 from app.models.models import db, Crash
-import os
+import os, json
+
 
 offense_bp = Blueprint('offense', __name__, url_prefix='/offense')
 
-def get_primary_cause_distribution(beat='all'):
+def get_primary_cause_distribution(beat='all', cause=None, severity=None):
     """
     Returns a list of dicts:
       [{ 'cause': <PRIM_CONTRIBUTORY_CAUSE>, 'count': <int> }, …]
@@ -24,6 +25,14 @@ def get_primary_cause_distribution(beat='all'):
         except ValueError:
             pass
 
+    # **NEW**: apply cause filter
+    if cause:
+        q = q.filter(Crash.prim_contributory_cause == cause)
+
+    # **NEW**: apply severity filter
+    if severity:
+        q = q.filter(Crash.most_severe_injury == severity)
+
     q = (q
          .group_by(Crash.prim_contributory_cause)
          .order_by(func.count(Crash.crash_record_id).desc())
@@ -35,7 +44,7 @@ def get_primary_cause_distribution(beat='all'):
         for c, cnt in q
     ]
 
-def get_hit_and_run_features(beat='all'):
+def get_hit_and_run_features(beat='all', cause=None, severity=None):
     """
     Returns a list of GeoJSON Feature dicts for hit-and-run crashes,
     filtered by beat_of_occurrence if beat!='all'.
@@ -44,7 +53,8 @@ def get_hit_and_run_features(beat='all'):
         Crash.latitude.label('lat'),
         Crash.longitude.label('lng'),
         Crash.crash_date.label('date'),
-        Crash.prim_contributory_cause.label('cause')
+        Crash.prim_contributory_cause.label('cause'),
+        Crash.most_severe_injury.label('severity')
     ).filter(Crash.hit_and_run_i == 'Y')
 
     if beat != 'all':
@@ -53,6 +63,11 @@ def get_hit_and_run_features(beat='all'):
             q = q.filter(Crash.beat_of_occurrence == b)
         except ValueError:
             pass
+        
+    if cause:
+        q = q.filter(Crash.prim_contributory_cause == cause)
+    if severity:
+        q = q.filter(Crash.most_severe_injury == severity)
 
     features = []
     for row in q:
@@ -95,17 +110,18 @@ def offense_page():
 @offense_bp.route('/api/primary-cause')
 def primary_cause_api():
     beat = request.args.get('beat', 'all')
-    data = get_primary_cause_distribution(beat)
+    cause    = request.args.get('cause', None)
+    severity = request.args.get('severity', None)
+    data = get_primary_cause_distribution(beat, cause, severity)
     return jsonify(data)
 
 @offense_bp.route('/api/hit-and-run')
 def hit_and_run_api():
-    beat = request.args.get('beat', 'all')
-    features = get_hit_and_run_features(beat)
-    return jsonify({
-        "type": "FeatureCollection",
-        "features": features
-    })
+    beat     = request.args.get('beat', 'all')
+    cause    = request.args.get('cause', None)
+    severity = request.args.get('severity', None)
+    features = get_hit_and_run_features(beat, cause, severity)
+    return jsonify({"type": "FeatureCollection", "features": features})
 
 @offense_bp.route('/api/beat-choropleth')
 def beat_choropleth_api():
@@ -127,3 +143,52 @@ def beat_choropleth_api():
         feat['properties']['hit_and_run_count'] = counts.get(int(beat_id), 0)
 
     return jsonify(geo)
+
+@offense_bp.route('/api/cause-severity')
+def cause_severity_api():
+    beat = request.args.get('beat', 'all')
+    cause    = request.args.get('cause', None)
+    severity = request.args.get('severity', None)
+    q = db.session.query(
+        Crash.prim_contributory_cause.label('cause'),
+        Crash.most_severe_injury.label('severity'),
+        func.count(Crash.crash_record_id).label('count')
+    )
+    # hit only that beat if requested
+    if beat != 'all':
+        try:
+            q = q.filter(Crash.beat_of_occurrence == int(beat))
+        except ValueError:
+            pass
+    if cause:
+        q = q.filter(Crash.prim_contributory_cause == cause)
+    if severity:
+        q = q.filter(Crash.most_severe_injury == severity)
+
+    q = q.group_by(Crash.prim_contributory_cause, Crash.most_severe_injury)
+    data = [
+        {'cause': c or 'Unknown',
+         'severity': s or 'Unknown',
+         'count': cnt}
+        for c, s, cnt in q
+    ]
+    return jsonify(data)
+
+@offense_bp.route('/api/most-hit-and-run-beat')
+def summary_top_hit_and_run_beat():
+    row = (
+        db.session.query(
+            Crash.beat_of_occurrence.label('beat'),
+            func.count(Crash.crash_record_id).label('count')
+        )
+        .filter(Crash.hit_and_run_i == 'Y')
+        .group_by(Crash.beat_of_occurrence)
+        .order_by(func.count(Crash.crash_record_id).desc())
+        .first()
+    )
+    if row:
+        beat, cnt = row.beat, row.count
+    else:
+        beat, cnt = None, 0
+
+    return jsonify({'beat': beat, 'count': cnt})
