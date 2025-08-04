@@ -60,3 +60,11 @@ class Crash(db.Model):
     latitude                       = db.Column(db.Float,      name="LATITUDE")
     longitude                      = db.Column(db.Float,      name="LONGITUDE")
     location                       = db.Column(db.String,     name="LOCATION")
+
+class User(db.Model):
+    user_id                     = db.Column(db.Integer,  name="id")
+    user_name                   = db.Column(db.String,  name="username")
+    user_email                  = db.Column(db.String,  name="email")
+    user_password               = db.Column(db.String,      name="password_hash")
+    user_active                 = db.Column(db.Boolean,      name="is_active")
+    
