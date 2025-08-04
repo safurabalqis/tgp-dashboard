@@ -63,8 +63,10 @@ class Crash(db.Model):
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.Text, nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
+    
+    user_id         = db.Column('id', db.Integer, primary_key=True)
+    user_name       = db.Column('username', db.String, nullable=False)
+    user_email      = db.Column('email', db.String, unique=True, nullable=False)
+    user_password   = db.Column('password_hash', db.String, nullable=False)
+    user_active     = db.Column('is_active', db.Boolean, default=True)
+    
