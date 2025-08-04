@@ -110,6 +110,18 @@
                                 {% block greeting %}{% endblock %}
                             </p>
                         </div>
+                        {% if session.get('user_id') %}
+                        <div class="ms-auto text-end">
+                            <span class="me-2"
+                                >👋 {{ session.get('user_name') }}</span
+                            >
+                            <a
+                                href="{{ url_for('auth.logout') }}"
+                                class="btn btn-outline-danger btn-sm"
+                                >Logout</a
+                            >
+                        </div>
+                        {% endif %}
                     </div>
                 </header>
 

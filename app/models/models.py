@@ -62,9 +62,11 @@ class Crash(db.Model):
     location                       = db.Column(db.String,     name="LOCATION")
 
 class User(db.Model):
-    user_id                     = db.Column(db.Integer,  name="id")
-    user_name                   = db.Column(db.String,  name="username")
-    user_email                  = db.Column(db.String,  name="email")
-    user_password               = db.Column(db.String,      name="password_hash")
-    user_active                 = db.Column(db.Boolean,      name="is_active")
+    __tablename__ = 'users'
+    
+    user_id         = db.Column('id', db.Integer, primary_key=True)
+    user_name       = db.Column('username', db.String, nullable=False)
+    user_email      = db.Column('email', db.String, unique=True, nullable=False)
+    user_password   = db.Column('password_hash', db.String, nullable=False)
+    user_active     = db.Column('is_active', db.Boolean, default=True)
     

@@ -15,14 +15,25 @@
             menu.
         </p>
         <div class="slogan">“Insights That Drive Safer Journeys”</div>
+        {% if session.get('user_id') %}
         <a
             href="{{ url_for('location.location_landing') }}"
             class="btn btn-purple btn-lg"
             role="button">
             View Location Overview
         </a>
-        <a href="/login" class="btn btn-primary me-2">Login</a>
-        <a href="/register" class="btn btn-outline-primary">Register</a>
+        {% else %}
+        <a
+            href="{{ url_for('auth.login') }}"
+            class="btn btn-primary btn-lg me-2"
+            >Login</a
+        >
+        <a
+            href="{{ url_for('auth.register') }}"
+            class="btn btn-outline-primary btn-lg"
+            >Register</a
+        >
+        {% endif %}
     </div>
 </div>
 {% endblock %}
