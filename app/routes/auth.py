@@ -4,6 +4,40 @@ from app.models.models import db, User
 
 auth_bp = Blueprint('auth', __name__)
 
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    if session.get('user_id'):
+        flash('You are already logged in.', 'info')
+        return redirect(url_for('location.location_landing'))
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password'].encode('utf-8')  # bcrypt requires bytes
+
+        # Check if email already exists
+        existing_user = User.query.filter_by(user_email=email).first()
+        if existing_user:
+            flash('Email already registered.', 'danger')
+            return redirect(url_for('auth.register'))
+
+        # Hash the password
+        hashed_password = bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')
+
+        # Save new user
+        user = User(
+            user_name=username,
+            user_email=email,
+            user_password=hashed_password
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        flash('Registration successful. Please log in.', 'success')
+        return redirect(url_for('auth.login'))
+
+    return render_template('register.html')
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -25,12 +59,6 @@ def login():
             flash('Invalid credentials.', 'danger')
     return render_template('login.html')
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        # Save new user
-        pass
-    return render_template('register.html')
 
 @auth_bp.route('/logout')
 def logout():
