@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from dotenv import load_dotenv
 from config import Config
 from app.models.models import db, Crash
@@ -37,6 +37,7 @@ app.register_blueprint(auth_bp)
 def require_login():
     allowed_routes = ['dashboard', 'auth.login', 'auth.register', 'static']
     if request.endpoint not in allowed_routes and 'user_id' not in session:
+        flash("You must log in to access this feature.", "danger")
         return redirect(url_for('dashboard'))
 
 # ─────────────────────────────
