@@ -13,3 +13,4 @@ tabulate
 SQLAlchemy
 fastapi
 uvicorn
+bcrypt
